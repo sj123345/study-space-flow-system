@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Consonants Learning Game</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; flex-direction: column; height: 100vh; }
+        #start-screen, #game-screen, #end-screen { display: none; }
+        .hearts { color: red; }
+    </style>
+</head>
+<body>
+
+    <div id="start-screen">
+        <h1>Welcome to the Thai Consonant Learning Game!</h1>
+        <button id="start-button">Start Game</button>
+    </div>
+
+    <div id="game-screen">
+        <h1>Guess the Thai Consonant</h1>
+        <div id="question">Question will appear here!</div>
+        <input type="text" id="answer-input" placeholder="Type your answer here">
+        <button id="submit-answer">Submit</button>
+        <div>
+            <h2>Your Hearts: <span id="heart-count" class="hearts"></span></h2>
+        </div>
+    </div>
+
+    <div id="end-screen">
+        <h1>Game Over!</h1>
+        <h2>Your score: <span id="final-score"></span></h2>
+        <button id="restart-button">Restart</button>
+    </div>
+
+    <script>
+        const consonants = ["ก", "ข", "ฃ", "ค", "ฅ", "ฆ", "ง", "จ", "ฉ", "ช", "ซ", "ฌ", "ญ", "ฎ", "ฏ", "ฐ", "ฑ", "ฒ", "ณ", "ด", "ต", "ถ", "ท", "ธ", "น", "บ", "ป", "ผ", "ฝ", "พ", "ฟ", "ภ", "ม", "ย", "ร", "ฤ", "ล", "ฦ", "ว", "ศ", "ษ", "ส", "ห", "ฬ", "อ", "ฮ"];
+        let currentScore = 0;
+        let hearts = 3;
+
+        document.getElementById('start-button').onclick = function() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'block';
+            startGame();
+        };
+
+        document.getElementById('submit-answer').onclick = function() {
+            checkAnswer();
+        };
+
+        document.getElementById('restart-button').onclick = function() {
+            hearts = 3;
+            currentScore = 0;
+            document.getElementById('end-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'block';
+            startGame();
+        };
+
+        function startGame() {
+            showQuestion();
+            updateHearts();
+        }
+
+        function showQuestion() {
+            const randomIndex = Math.floor(Math.random() * consonants.length);
+            document.getElementById('question').innerText = `What is this consonant? ${consonants[randomIndex]}`;
+        }
+
+        function checkAnswer() {
+            const userAnswer = document.getElementById('answer-input').value;
+            const correctAnswer = consonants.find(c => c === userAnswer);
+
+            if (correctAnswer) {
+                currentScore++;
+                document.getElementById('answer-input').value = ''; // Clear input
+                showQuestion();
+            } else {
+                hearts--;
+                if (hearts <= 0) {
+                    endGame();
+                } else {
+                    updateHearts();
+                    document.getElementById('answer-input').value = ''; // Clear input
+                    showQuestion();
+                }
+            }
+        }
+
+        function updateHearts() {
+            document.getElementById('heart-count').innerText = '❤️'.repeat(hearts);
+        }
+
+        function endGame() {
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('end-screen').style.display = 'block';
+            document.getElementById('final-score').innerText = currentScore;
+        }
+    </script>
+
+    <script>
+        // Initialize start screen
+        document.getElementById('start-screen').style.display = 'block';
+    </script>
+</body>
+</html>
