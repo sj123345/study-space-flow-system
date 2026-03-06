@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+
 body{
 margin:0;
 font-family:'Segoe UI',sans-serif;
@@ -19,7 +20,7 @@ height:100vh;
 .card{
 background:white;
 width:95%;
-max-width:480px;
+max-width:500px;
 padding:40px 30px;
 border-radius:20px;
 box-shadow:0 15px 40px rgba(0,0,0,0.2);
@@ -30,7 +31,6 @@ text-align:center;
 font-size:26px;
 font-weight:bold;
 margin-bottom:20px;
-color:#444;
 }
 
 .stats{
@@ -58,6 +58,7 @@ border:none;
 border-radius:12px;
 cursor:pointer;
 background:#ffe6f0;
+transition:0.2s;
 }
 
 .options button:hover{
@@ -71,7 +72,7 @@ margin-top:10px;
 height:24px;
 }
 
-button.primary{
+.primary{
 margin-top:20px;
 padding:12px 24px;
 border:none;
@@ -85,6 +86,7 @@ cursor:pointer;
 .hidden{
 display:none;
 }
+
 </style>
 </head>
 
@@ -92,27 +94,36 @@ display:none;
 
 <div class="card">
 
+<!-- START SCREEN -->
+
 <div id="startScreen">
+
 <div class="subtitle">CSII Team Caviar Presents</div>
 
-<input id="nickname" placeholder="Enter your nickname"
+<input id="nickname" placeholder="Enter nickname"
 style="padding:10px;border-radius:8px;border:1px solid #ccc">
 
 <br><br>
 
 <button class="primary" onclick="startGame()">Start Quiz</button>
+
 </div>
 
 
+<!-- GAME SCREEN -->
+
 <div id="gameScreen" class="hidden">
 
-<div id="playerName"></div>
-<div id="streak"></div>
+<div id="player"></div>
+<div id="backendStreak"></div>
 
 <div class="stats">
 <div>❤️ Lives: <span id="lives">3</span></div>
 <div>📚 Progress: <span id="progress">0</span>/44</div>
 </div>
+
+<div>🔥 Current Streak: <span id="streak">0</span></div>
+<div>🏆 Best Streak: <span id="best">0</span></div>
 
 <div class="consonant" id="consonant"></div>
 
@@ -120,11 +131,11 @@ style="padding:10px;border-radius:8px;border:1px solid #ccc">
 
 <div class="message" id="message"></div>
 
-<button id="restartBtn" class="primary hidden" onclick="restartGame()">Restart</button>
+<button id="restart" class="primary hidden" onclick="restartGame()">Restart</button>
 
 </div>
-</div>
 
+</div>
 
 <script>
 
@@ -178,7 +189,9 @@ const consonants = [
 let shuffled=[]
 let currentIndex=0
 let lives=3
-let nickname=""
+
+let streak=0
+let best=0
 
 function shuffle(a){
 return a.sort(()=>Math.random()-0.5)
@@ -186,84 +199,136 @@ return a.sort(()=>Math.random()-0.5)
 
 function startGame(){
 
-nickname=document.getElementById("nickname").value
+let nickname=document.getElementById("nickname").value
 
-document.getElementById("playerName").textContent="Player: "+nickname
+document.getElementById("player").textContent="Player: "+nickname
+
+/* BACKEND CALL */
 
 fetch("https://YOURSITE-service.onrender.com/start/"+nickname)
 .then(r=>r.json())
 .then(data=>{
-document.getElementById("streak").textContent="🔥 Streak: "+data.counter
+document.getElementById("backendStreak").textContent=
+"🔥 Daily Streak: "+data.counter
 })
-
-shuffled=shuffle([...consonants])
-currentIndex=0
-lives=3
 
 document.getElementById("startScreen").classList.add("hidden")
 document.getElementById("gameScreen").classList.remove("hidden")
 
+shuffled=shuffle([...consonants])
+currentIndex=0
+lives=3
+streak=0
+best=0
+
 updateUI()
 showQuestion()
+
 }
 
 function updateUI(){
+
 document.getElementById("lives").textContent=lives
 document.getElementById("progress").textContent=currentIndex
+
+document.getElementById("streak").textContent=streak
+document.getElementById("best").textContent=best
+
 }
 
 function showQuestion(){
 
 if(currentIndex>=shuffled.length){
-alert("You mastered all Thai consonants!")
+victory()
 return
 }
 
-const current=shuffled[currentIndex]
+let current=shuffled[currentIndex]
 
 document.getElementById("consonant").textContent=current.letter
 
 let options=[current.answer]
 
 while(options.length<4){
+
 let rand=consonants[Math.floor(Math.random()*consonants.length)].answer
+
 if(!options.includes(rand)) options.push(rand)
+
 }
 
 options=shuffle(options)
 
-const optionsDiv=document.getElementById("options")
+let optionsDiv=document.getElementById("options")
 optionsDiv.innerHTML=""
 
 options.forEach(option=>{
-const btn=document.createElement("button")
+
+let btn=document.createElement("button")
 btn.textContent=option
+
 btn.onclick=()=>checkAnswer(option)
+
 optionsDiv.appendChild(btn)
+
 })
+
 }
 
 function checkAnswer(selected){
 
-const correct=shuffled[currentIndex].answer
+let correct=shuffled[currentIndex].answer
 
 if(selected===correct){
+
+streak++
+
+if(streak>best) best=streak
+
 currentIndex++
+
+document.getElementById("message").textContent="✅ Correct!"
+
 updateUI()
 showQuestion()
+
 }
+
 else{
 
 lives--
+streak=0
 
-document.getElementById("message").textContent="Wrong! Correct: "+correct
+document.getElementById("message").textContent="❌ Wrong! Correct: "+correct
 
 updateUI()
 
-if(lives<=0){
-alert("Game Over")
+if(lives<=0) gameOver()
+
 }
+
 }
+
+function gameOver(){
+
+document.getElementById("options").innerHTML=""
+document.getElementById("consonant").textContent="💀"
+
+document.getElementById("message").textContent="Game Over"
+
+document.getElementById("restart").classList.remove("hidden")
+
+}
+
+function victory(){
+
+document.getElementById("options").innerHTML=""
+document.getElementById("consonant").textContent="🎉"
+
+document.getElementById("message").textContent="You mastered all Thai consonants!"
+
+document.getElementById("restart").classList.remove("hidden")
+
 }
 
 function restartGame(){
@@ -271,5 +336,6 @@ location.reload()
 }
 
 </script>
+
 </body>
 </html>
