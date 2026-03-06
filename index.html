@@ -6,126 +6,128 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+body{
+margin:0;
+font-family:'Segoe UI',sans-serif;
+background:linear-gradient(135deg,#ff9a9e,#fad0c4);
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
 }
 
-.card {
-  background: white;
-  width: 95%;
-  max-width: 480px;
-  padding: 40px 30px;
-  border-radius: 20px;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-  text-align: center;
+.card{
+background:white;
+width:95%;
+max-width:480px;
+padding:40px 30px;
+border-radius:20px;
+box-shadow:0 15px 40px rgba(0,0,0,0.2);
+text-align:center;
 }
 
-.subtitle {
-  font-size: 26px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  color: #444;
+.subtitle{
+font-size:26px;
+font-weight:bold;
+margin-bottom:20px;
+color:#444;
 }
 
-.stats {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  margin-bottom: 10px;
-  color: #ff3399;
-  font-weight: bold;
+.stats{
+display:flex;
+justify-content:space-between;
+font-size:14px;
+margin-bottom:10px;
+color:#ff3399;
+font-weight:bold;
 }
 
-.hearts {
-  font-size: 24px;
-  margin-bottom: 10px;
+.consonant{
+font-size:110px;
+margin:20px 0;
+font-weight:bold;
 }
 
-.consonant {
-  font-size: 110px;
-  margin: 20px 0;
-  font-weight: bold;
+.options button{
+display:block;
+margin:10px auto;
+padding:14px;
+font-size:16px;
+width:100%;
+border:none;
+border-radius:12px;
+cursor:pointer;
+background:#ffe6f0;
 }
 
-.options button {
-  display: block;
-  margin: 10px auto;
-  padding: 14px;
-  font-size: 16px;
-  width: 100%;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  background: #ffe6f0;
-  transition: 0.2s ease;
+.options button:hover{
+background:#ff66a3;
+color:white;
 }
 
-.options button:hover:not(:disabled) {
-  background: #ff66a3;
-  color: white;
+.message{
+font-size:16px;
+margin-top:10px;
+height:24px;
 }
 
-.message {
-  font-size: 16px;
-  margin-top: 10px;
-  height: 24px;
+button.primary{
+margin-top:20px;
+padding:12px 24px;
+border:none;
+border-radius:30px;
+background:#ff66a3;
+color:white;
+font-size:16px;
+cursor:pointer;
 }
 
-.gameover {
-  font-size: 22px;
-  color: #d0006f;
-  margin-top: 20px;
-  font-weight: bold;
-}
-
-button.primary {
-  margin-top: 20px;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 30px;
-  background: #ff66a3;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.hidden {
-  display: none;
+.hidden{
+display:none;
 }
 </style>
 </head>
+
 <body>
 
 <div class="card">
 
 <div id="startScreen">
-  <div class="subtitle">CSII Team Caviar Presents</div>
-  <button class="primary" onclick="startGame()">Start Quiz</button>
+<div class="subtitle">CSII Team Caviar Presents</div>
+
+<input id="nickname" placeholder="Enter your nickname"
+style="padding:10px;border-radius:8px;border:1px solid #ccc">
+
+<br><br>
+
+<button class="primary" onclick="startGame()">Start Quiz</button>
 </div>
+
 
 <div id="gameScreen" class="hidden">
 
-  <div class="stats">
-    <div>❤️ Lives: <span id="lives">3</span></div>
-    <div>📚 Progress: <span id="progress">0</span>/44</div>
-  </div>
+<div id="playerName"></div>
+<div id="streak"></div>
 
-  <div class="consonant" id="consonant"></div>
-  <div class="options" id="options"></div>
-  <div class="message" id="message"></div>
-  <div class="gameover" id="gameover"></div>
-  <button id="restartBtn" class="primary hidden" onclick="restartGame()">Restart</button>
+<div class="stats">
+<div>❤️ Lives: <span id="lives">3</span></div>
+<div>📚 Progress: <span id="progress">0</span>/44</div>
+</div>
+
+<div class="consonant" id="consonant"></div>
+
+<div class="options" id="options"></div>
+
+<div class="message" id="message"></div>
+
+<button id="restartBtn" class="primary hidden" onclick="restartGame()">Restart</button>
 
 </div>
 </div>
+
 
 <script>
+
 const consonants = [
 {letter:"ก",answer:"ko kai"},
 {letter:"ข",answer:"kho khai"},
@@ -173,108 +175,101 @@ const consonants = [
 {letter:"ฮ",answer:"ho nokhuk"}
 ];
 
-let shuffled = [];
-let currentIndex = 0;
-let lives = 3;
-let gameActive = false;
+let shuffled=[]
+let currentIndex=0
+let lives=3
+let nickname=""
 
-function shuffle(array){
-  return array.sort(()=>Math.random()-0.5);
+function shuffle(a){
+return a.sort(()=>Math.random()-0.5)
 }
 
 function startGame(){
-  shuffled = shuffle([...consonants]);
-  currentIndex = 0;
-  lives = 3;
-  gameActive = true;
 
-  document.getElementById("startScreen").classList.add("hidden");
-  document.getElementById("gameScreen").classList.remove("hidden");
+nickname=document.getElementById("nickname").value
 
-  updateUI();
-  showQuestion();
+document.getElementById("playerName").textContent="Player: "+nickname
+
+fetch("https://YOURSITE-service.onrender.com/start/"+nickname)
+.then(r=>r.json())
+.then(data=>{
+document.getElementById("streak").textContent="🔥 Streak: "+data.counter
+})
+
+shuffled=shuffle([...consonants])
+currentIndex=0
+lives=3
+
+document.getElementById("startScreen").classList.add("hidden")
+document.getElementById("gameScreen").classList.remove("hidden")
+
+updateUI()
+showQuestion()
 }
 
 function updateUI(){
-  document.getElementById("lives").textContent = lives;
-  document.getElementById("progress").textContent = currentIndex;
+document.getElementById("lives").textContent=lives
+document.getElementById("progress").textContent=currentIndex
 }
 
 function showQuestion(){
-  if(currentIndex >= shuffled.length){
-    victory();
-    return;
-  }
 
-  const current = shuffled[currentIndex];
-  document.getElementById("consonant").textContent = current.letter;
-  document.getElementById("message").textContent = "";
+if(currentIndex>=shuffled.length){
+alert("You mastered all Thai consonants!")
+return
+}
 
-  let options = [current.answer];
+const current=shuffled[currentIndex]
 
-  while(options.length < 4){
-    let rand = consonants[Math.floor(Math.random()*consonants.length)].answer;
-    if(!options.includes(rand)){
-      options.push(rand);
-    }
-  }
+document.getElementById("consonant").textContent=current.letter
 
-  options = shuffle(options);
+let options=[current.answer]
 
-  const optionsDiv = document.getElementById("options");
-  optionsDiv.innerHTML = "";
+while(options.length<4){
+let rand=consonants[Math.floor(Math.random()*consonants.length)].answer
+if(!options.includes(rand)) options.push(rand)
+}
 
-  options.forEach(option=>{
-    const btn = document.createElement("button");
-    btn.textContent = option;
-    btn.onclick = ()=>checkAnswer(option);
-    optionsDiv.appendChild(btn);
-  });
+options=shuffle(options)
+
+const optionsDiv=document.getElementById("options")
+optionsDiv.innerHTML=""
+
+options.forEach(option=>{
+const btn=document.createElement("button")
+btn.textContent=option
+btn.onclick=()=>checkAnswer(option)
+optionsDiv.appendChild(btn)
+})
 }
 
 function checkAnswer(selected){
-  if(!gameActive) return;
 
-  const correct = shuffled[currentIndex].answer;
+const correct=shuffled[currentIndex].answer
 
-  if(selected === correct){
-    currentIndex++;
-    updateUI();
-    showQuestion();
-  } else {
-    lives--;
-    document.getElementById("message").textContent =
-      "❌ Wrong! Correct: " + correct;
-
-    if(lives <= 0){
-      gameOver();
-    }
-    updateUI();
-  }
+if(selected===correct){
+currentIndex++
+updateUI()
+showQuestion()
 }
+else{
 
-function gameOver(){
-  gameActive = false;
-  document.getElementById("gameover").textContent = "💀 YOU DIED 💀";
-  document.getElementById("restartBtn").classList.remove("hidden");
-  document.getElementById("options").innerHTML = "";
+lives--
+
+document.getElementById("message").textContent="Wrong! Correct: "+correct
+
+updateUI()
+
+if(lives<=0){
+alert("Game Over")
 }
-
-function victory(){
-  gameActive = false;
-  document.getElementById("consonant").textContent = "";
-  document.getElementById("options").innerHTML = "";
-  document.getElementById("gameover").textContent =
-    "🎉 CONGRATULATIONS! You mastered all 44 Thai consonants!";
-  document.getElementById("restartBtn").classList.remove("hidden");
+}
 }
 
 function restartGame(){
-  document.getElementById("gameover").textContent = "";
-  document.getElementById("restartBtn").classList.add("hidden");
-  startGame();
+location.reload()
 }
-</script>
 
+</script>
 </body>
 </html>
